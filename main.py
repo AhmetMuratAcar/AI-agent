@@ -1,0 +1,67 @@
+import os
+import sys
+from typing import Dict
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+
+def get_flag_map() -> Dict[str, bool]:
+    flag_map = {
+        "--verbose": False
+    }
+
+    return flag_map
+
+
+def generage_content(client, messages) -> genai.types.GenerateContentResponse:
+    response = client.models.generate_content(
+        model="gemini-2.0-flash-001",
+        contents=messages
+    )
+
+    return response
+
+
+def prep_sys() -> genai.Client:
+    load_dotenv()
+    api_key = os.environ.get("GEMINI_API_KEY")
+    client = genai.Client(api_key=api_key)
+
+    return client
+
+
+def main():
+    args = sys.argv[1:]
+    if not args:
+        print("ERROR: No prompt provided")
+        print('USAGE: python3 main.py "your prompr"')
+        sys.exit(1)
+
+    # Setting flags
+    flags = get_flag_map()
+    for arg in args[1:]:
+        if arg in flags:
+            flags[arg] = True
+
+    # Creating user prompt
+    user_prompt = args[0]
+    messages = [
+        types.Content(role="user", parts=[types.Part(text=user_prompt)])
+    ]
+
+    client = prep_sys()
+    query = generage_content(client=client, messages=messages)
+
+    # Flag checks
+    if flags["--verbose"] is True:
+        print(f"User prompt: {user_prompt}")
+        print(f"Prompt tokens: {query.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {query.usage_metadata.candidates_token_count}\n")
+
+    # Query result
+    print(query.text)
+
+
+if __name__ == "__main__":
+    main()
