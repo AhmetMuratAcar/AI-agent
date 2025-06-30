@@ -43,7 +43,7 @@ def main():
     args = sys.argv[1:]
     if not args:
         print("ERROR: No prompt provided")
-        print('USAGE: python3 main.py "your prompt" --flags')
+        print('USAGE: uv run main.py "your prompt" --flags')
         sys.exit(1)
 
     # Setting flags
