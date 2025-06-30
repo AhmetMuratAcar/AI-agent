@@ -2,6 +2,9 @@ import os
 
 
 def get_files_info(working_directory: str, directory: str = None) -> str:
+    if not directory:
+        directory = "."
+
     try:
         full_path = os.path.join(working_directory, directory)
 

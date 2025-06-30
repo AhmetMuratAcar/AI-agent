@@ -7,6 +7,7 @@ def run_tests():
         ("calculator", "pkg"),     # Expected: valid result
         ("calculator", "/bin"),    # Expected: error string
         ("calculator", "../"),     # Expected: error string
+        ("calculator", None)
     ]
 
     for i, (working_dir, directory) in enumerate(test_cases, 1):
