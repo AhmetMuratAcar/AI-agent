@@ -1,3 +1,4 @@
+from functions.run_python_file import run_python_file
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.write_file import write_file
@@ -48,7 +49,23 @@ def test_write_file():
         print(result, "\n")
 
 
+def test_run_python_file():
+    print("=== Testing run_python_file ===")
+    test_cases = [
+        ("calculator", "main.py"),           # Expected: script runs successfully
+        ("calculator", "tests.py"),          # Expected: script runs successfully
+        ("calculator", "../main.py"),        # Expected: error (outside working directory)
+        ("calculator", "nonexistent.py")     # Expected: error (file does not exist)
+    ]
+
+    for i, (working_dir, file_path) in enumerate(test_cases, 1):
+        print(f"Test {i}: run_python_file({working_dir!r}, {file_path!r})")
+        result = run_python_file(working_dir, file_path)
+        print(result, "\n")
+
+
 if __name__ == "__main__":
     test_get_files_info()
     test_get_file_content()
     test_write_file()
+    test_run_python_file()
