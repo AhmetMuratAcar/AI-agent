@@ -1,5 +1,6 @@
 import os
 import sys
+from config import MODEL, SYSTEM_PROMPT
 from typing import Dict
 from dotenv import load_dotenv
 from google import genai
@@ -16,8 +17,9 @@ def get_flag_map() -> Dict[str, bool]:
 
 def generage_content(client, messages) -> genai.types.GenerateContentResponse:
     response = client.models.generate_content(
-        model="gemini-2.0-flash-001",
-        contents=messages
+        model=MODEL,
+        contents=messages,
+        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
     )
 
     return response

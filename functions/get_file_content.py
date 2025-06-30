@@ -1,4 +1,5 @@
 import os
+from config import MAX_CHARS
 
 
 def get_file_content(working_directory: str, file_path: str) -> str:
@@ -18,11 +19,10 @@ def get_file_content(working_directory: str, file_path: str) -> str:
             return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
 
         # Read and write file content
-        MAX_CHARS = 10000
         with open(full_path, "r") as f:
             file_content_string = f.read(MAX_CHARS)
 
-        if len(file_content_string) == 10000:
+        if len(file_content_string) == MAX_CHARS:
             file_content_string += f'\n[...File "{file_path}" truncated at {MAX_CHARS} characters]'
 
         return file_content_string
