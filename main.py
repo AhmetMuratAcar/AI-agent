@@ -1,7 +1,10 @@
 import os
 import sys
-from config import MODEL, SYSTEM_PROMPT
 from typing import Dict
+
+from config import MODEL, SYSTEM_PROMPT
+from available_functions import available_functions
+
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
@@ -19,7 +22,10 @@ def generage_content(client, messages) -> genai.types.GenerateContentResponse:
     response = client.models.generate_content(
         model=MODEL,
         contents=messages,
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=SYSTEM_PROMPT
+        ),
     )
 
     return response
@@ -53,7 +59,10 @@ def main():
     ]
 
     client = prep_sys()
-    response = generage_content(client=client, messages=messages)
+    response = generage_content(
+        client=client,
+        messages=messages,
+    )
 
     # Flag checks
     if flags["--verbose"] is True:
@@ -62,6 +71,9 @@ def main():
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}\n")
 
     # Query result
+    if response.function_calls:
+        for call in response.function_calls:
+            print(f"Calling function: {call.name}({call.args})")
     print(response.text)
 
 
