@@ -51,16 +51,16 @@ def main():
     ]
 
     client = prep_sys()
-    query = generage_content(client=client, messages=messages)
+    response = generage_content(client=client, messages=messages)
 
     # Flag checks
     if flags["--verbose"] is True:
         print(f"User prompt: {user_prompt}")
-        print(f"Prompt tokens: {query.usage_metadata.prompt_token_count}")
-        print(f"Response tokens: {query.usage_metadata.candidates_token_count}\n")
+        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {response.usage_metadata.candidates_token_count}\n")
 
     # Query result
-    print(query.text)
+    print(response.text)
 
 
 if __name__ == "__main__":
