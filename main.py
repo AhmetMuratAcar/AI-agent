@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Dict
 
-from config import MODEL, SYSTEM_PROMPT
+from config import MODEL, SYSTEM_PROMPT, MAX_ITERATIONS
 from available_functions import available_functions
 from functions.call_function import call_function
 
@@ -19,7 +19,12 @@ def get_flag_map() -> Dict[str, bool]:
     return flag_map
 
 
-def generage_content(client, messages, flags) -> genai.types.GenerateContentResponse:
+def generage_content(
+    client: genai.Client,
+    messages: list[types.Content],
+    flags: Dict[str, bool]
+) -> genai.types.GenerateContentResponse:
+
     response = client.models.generate_content(
         model=MODEL,
         contents=messages,
@@ -34,21 +39,35 @@ def generage_content(client, messages, flags) -> genai.types.GenerateContentResp
         print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}\n")
 
+    # Updating messages with response variations
+    if response.candidates:
+        for c in response.candidates:
+            func_call_content = c.content
+            messages.append(func_call_content)
+
     # Calling functions
-    if response.function_calls:
-        for call in response.function_calls:
-            func_res = call_function(
-                function_call_part=call,
-                verbose=flags["--verbose"]
-            )
+    if not response.function_calls:
+        return response.text
 
-            if not func_res.parts[0].function_response.response:
-                raise Exception("Error: no response from function")
+    func_responses = []
+    for call in response.function_calls:
+        func_res = call_function(
+            function_call_part=call,
+            verbose=flags["--verbose"]
+        )
 
-            if flags["--verbose"] is True:
-                print(f"-> {func_res.parts[0].function_response.response}")
+        if not func_res.parts[0].function_response.response:
+            raise Exception("Error: no response from function")
 
-    return response
+        if flags["--verbose"] is True:
+            print(f"-> {func_res.parts[0].function_response.response}")
+
+        func_responses.append(func_res.parts[0])
+
+    if not func_responses:
+        raise Exception("Function calls yielded no responses.")
+
+    messages.append(types.Content(role="tool", parts=func_responses))
 
 
 def prep_sys() -> genai.Client:
@@ -82,14 +101,29 @@ def main():
     if flags["--verbose"] is True:
         print(f"User prompt: {user_prompt}")
 
-    # Conducting query
+    # REPL
     client = prep_sys()
-    response = generage_content(
-        client=client,
-        messages=messages,
-        flags=flags,
-    )
-    print(response.text)
+    count = 0
+    while True:
+        count += 1
+        if count > MAX_ITERATIONS:
+            print(f"You have reached the maximum iterations: {MAX_ITERATIONS}")
+            sys.exit(1)
+
+        # Conducting query
+        try:
+            exit_text = generage_content(
+                client=client,
+                messages=messages,
+                flags=flags,
+            )
+
+            if exit_text:
+                print(f"Final response:\n{exit_text}")
+                break
+
+        except Exception as e:
+            print(f"Error generating content: {e}")
 
 
 if __name__ == "__main__":

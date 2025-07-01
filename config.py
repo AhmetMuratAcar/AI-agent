@@ -1,3 +1,4 @@
+MAX_ITERATIONS = 20
 MAX_CHARS = 10_000
 MODEL = "gemini-2.0-flash-001"
 SYSTEM_PROMPT = """
