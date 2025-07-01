@@ -43,7 +43,8 @@ def get_file_content(working_directory: str, file_path: str) -> str:
 
 def write_file(working_directory: str, file_path: str, content: str) -> str:
     """
-    Destructive write, completely replaces file contents. Creates required directories and files.
+    Destructive write, completely replaces file contents.
+    Creates required directories and files.
     """
 
 def run_python_file(working_directory: str, file_path: str, args=None) -> str:
