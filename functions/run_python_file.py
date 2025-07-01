@@ -1,5 +1,26 @@
 import os
 import subprocess
+from google.genai import types
+
+
+# Schema for LLM
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="Executes the script for a given Python file path, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path of the Python file that will be executed to. Relative to the working directory.",
+            ),
+            "args": types.Schema(
+                type=types.Type.OBJECT,
+                description="Arguments that will be passed onto the script for the Python file being executed. Optional parameter that defaults to None.",
+            ),
+        },
+    ),
+)
 
 
 def run_python_file(working_directory: str, file_path: str, args=None) -> str:

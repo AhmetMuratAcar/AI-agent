@@ -1,4 +1,25 @@
 import os
+from google.genai import types
+
+
+# Schema for LLM
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="Writes the given contents to the given file path replacing previously existing content, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path of the file that will be written to. Relative to the working directory.",
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="Content that will be written to the file at given file path.",
+            ),
+        },
+    ),
+)
 
 
 def write_file(working_directory: str, file_path: str, content: str) -> str:
