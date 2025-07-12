@@ -33,12 +33,13 @@ The agent is currently limited to:
 ```Python
 def get_files_info(working_directory: str, directory: str = None) -> str:
     """
-    - {file_name}: {file_size}={size} bytes, is_dir={bool}
+    - file_name:{name} file_size={size} bytes, is_dir={bool}
+    ...for all files in directory
     """
 
 def get_file_content(working_directory: str, file_path: str) -> str:
     """
-    Returns complete contents of given file, capped at MAX_CHARS
+    Returns complete contents of given file, capped at MAX_CHARS.
     """
 
 def write_file(working_directory: str, file_path: str, content: str) -> str:
